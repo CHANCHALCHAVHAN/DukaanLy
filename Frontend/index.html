@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- Favicons for system preference (automatic for supporting browsers) -->
+    <!-- light theme favicon -->
+    <link rel="icon" href="https://cdn-icons-png.freepik.com/512/2639/2639570.png" media="(prefers-color-scheme: light)" />
+    <!-- dark theme favicon -->
+    <link rel="icon" href="https://images.vexels.com/media/users/3/223412/isolated/preview/bd3704cf52ba23499660b8bae7221daf-store-icon-flat-design.png" media="(prefers-color-scheme: dark)" />
+    <!-- default favicon (fallback) and the one JS will update -->
+    <link rel="icon" id="favicon" href="https://cdn-icons-png.freepik.com/512/2639/2639570.png" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>DUKAANLY - AI-Powered Shop Management System</title>
+    <meta name="description" content="Manage your shop inventory, track expiry dates, and grow your business with DUKAANLY - the complete AI-powered shop assistant." />
+    <meta name="author" content="DUKAANLY" />
+
+    <meta property="og:title" content="DUKAANLY - AI-Powered Shop Management" />
+    <meta property="og:description" content="Smart inventory management for Local shops. Track stock, manage expiry dates, and boost profits." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="public/dukaan.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@lovable_dev" />
+    <meta name="twitter:image" content="public/dukaan.png" />
+
+    <!-- your main stylesheet -->
+    <link rel="stylesheet" href="/src/index.css">
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!--
+      JS fallback and toggle handler:
+      - Keeps favicon in sync when you toggle the ".dark" class in your app (Tailwind style).
+      - Listens for system theme changes and updates the favicon as well.
+    -->
+    <script>
+      (function () {
+        // URLs for the favicons (you already provided these)
+        const LIGHT_FAV = 'https://cdn-icons-png.freepik.com/512/2639/2639570.png';
+        const DARK_FAV = 'https://images.vexels.com/media/users/3/223412/isolated/preview/bd3704cf52ba23499660b8bae7221daf-store-icon-flat-design.png';
+
+        const setFavicon = (isDark) => {
+          const el = document.getElementById('favicon');
+          if (!el) return;
+          el.href = isDark ? DARK_FAV : LIGHT_FAV;
+        };
+
+        // 1) Initialize based on: a) .dark class on <html> OR b) system preference
+        const docEl = document.documentElement;
+        const hasDarkClass = () => docEl.classList.contains('dark');
+
+        // prefer explicit .dark class if present, otherwise use system preference
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setFavicon(hasDarkClass() ? true : prefersDark);
+
+        // 2) Observe changes to the class attribute on <html> so we can update when your app toggles dark mode
+        const observer = new MutationObserver(mutations => {
+          for (const m of mutations) {
+            if (m.type === 'attributes' && m.attributeName === 'class') {
+              setFavicon(hasDarkClass());
+            }
+          }
+        });
+        observer.observe(docEl, { attributes: true });
+
+        // 3) Listen for system theme changes as well
+        if (window.matchMedia) {
+          const mq = window.matchMedia('(prefers-color-scheme: dark)');
+          const mqHandler = (e) => {
+            // only switch based on system if there's no explicit .dark control
+            if (!hasDarkClass()) setFavicon(e.matches);
+          };
+          // modern browsers:
+          if (typeof mq.addEventListener === 'function') {
+            mq.addEventListener('change', mqHandler);
+          } else if (typeof mq.addListener === 'function') {
+            mq.addListener(mqHandler);
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
